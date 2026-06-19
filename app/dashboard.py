@@ -42,8 +42,17 @@ elif page == "Sensor Trends":
         st.warning("Dataset not found locally. Place the archive/ folder in the project root.")
 
 elif page == "Predictions":
-    st.header("Failure Predictions")
-    st.write("Live prediction interface — coming soon.")
+    st.header("Failure Prediction Interface")
+    st.markdown("Enter sensor readings below to predict component failure risk.")
+    col1, col2 = st.columns(2)
+    with col1:
+        volt = st.number_input("Voltage (volt)", min_value=0.0, value=170.0, step=0.1)
+        rotate = st.number_input("Rotation Speed (rotate)", min_value=0.0, value=450.0, step=0.1)
+    with col2:
+        pressure = st.number_input("Pressure (pressure)", min_value=0.0, value=100.0, step=0.1)
+        vibration = st.number_input("Vibration (vibration)", min_value=0.0, value=40.0, step=0.1)
+    if st.button("Predict Failure Risk"):
+        st.info("Model not yet integrated. Prediction will be available after training is complete.")
 
 elif page == "Explainability":
     st.header("SHAP Feature Importance")
