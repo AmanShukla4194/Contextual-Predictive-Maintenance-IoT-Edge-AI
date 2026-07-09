@@ -22,4 +22,7 @@ def split_by_time(df, test_months=2):
 def get_feature_cols(df, exclude=None):
     if exclude is None:
         exclude = ["machineID", "datetime", "label", "label_enc"]
-    return [c for c in df.columns if c not in exclude]
+    return [
+        c for c in df.columns
+        if c not in exclude and pd.api.types.is_numeric_dtype(df[c])
+    ]

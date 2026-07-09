@@ -2,6 +2,7 @@ import os
 import csv
 from datetime import datetime
 from config import REPORTS_DIR
+from src.models.predictor import inverse_label_map
 
 
 LOG_FILE = os.path.join(REPORTS_DIR, "prediction_log.csv")
@@ -18,9 +19,10 @@ def _ensure_log():
 
 def log_prediction(machine_id, predicted_label, proba, label_map):
     _ensure_log()
+    inv_map = inverse_label_map(label_map)
     sorted_idx = sorted(range(len(proba)), key=lambda i: proba[i], reverse=True)
-    top1 = label_map.get(sorted_idx[0], str(sorted_idx[0]))
-    top2 = label_map.get(sorted_idx[1], str(sorted_idx[1])) if len(sorted_idx) > 1 else ""
+    top1 = predicted_label or inv_map.get(sorted_idx[0], str(sorted_idx[0]))
+    top2 = inv_map.get(sorted_idx[1], str(sorted_idx[1])) if len(sorted_idx) > 1 else ""
 
     row = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from src.models.predictor import load_model
+from src.models.predictor import load_model, decode_labels
 
 
 def predict_batch(df, feature_cols=None, model=None, label_map=None):
@@ -12,7 +12,7 @@ def predict_batch(df, feature_cols=None, model=None, label_map=None):
     probas = model.predict_proba(X)
 
     results = df[["machineID", "datetime"]].copy() if "datetime" in df.columns else df[["machineID"]].copy()
-    results["predicted_label"] = [label_map.get(p, str(p)) if label_map else str(p) for p in preds]
+    results["predicted_label"] = decode_labels(preds, label_map) if label_map else [str(p) for p in preds]
     results["confidence"] = np.round(probas.max(axis=1), 4)
     return results
 

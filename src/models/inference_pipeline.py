@@ -1,30 +1,16 @@
-from src.data.preprocessor import merge_machine_info
-from src.features.feature_pipeline import build_features
-from src.models.predictor import load_model, predict, predict_proba
-from src.data.loader import load_all
+from src.models.predictor import load_model, predict, predict_proba, prepare_feature_frame
 
 
 def run_inference(telemetry_df=None):
-    data = load_all()
-
-    if telemetry_df is None:
-        telemetry_df = data["telemetry"]
-
-    df = merge_machine_info(telemetry_df, data["machines"])
-    df = build_features(df, data["maintenance"], data["errors"])
-
     model, feature_cols, label_map = load_model()
-
-    missing = [c for c in feature_cols if c not in df.columns]
-    for c in missing:
-        df[c] = 0.0
+    df = prepare_feature_frame(telemetry_df, feature_cols)
 
     X = df[feature_cols].values
     preds = predict(model, X)
     probas = predict_proba(model, X)
 
     df = df[["machineID", "datetime"]].copy()
-    df["predicted_label"] = [label_map.get(p, str(p)) for p in preds]
+    df["predicted_label"] = preds
     df["confidence"] = probas.max(axis=1).round(4)
     return df
 
